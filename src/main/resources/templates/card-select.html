@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>카드 선택 - 타로다요</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="select-container">
+    <h2 class="select-title">🌙 카드를 선택하세요</h2>
+    <p class="select-subtitle">"<span th:text="${question}"></span>"</p>
+    <p class="select-guide">5장 중 <strong>3장</strong>을 골라주세요</p>
+    <div class="selected-count">선택됨: <span id="count">0</span> / 3</div>
+
+    <form id="selectForm" action="/result" method="post">
+        <div class="cards-area">
+            <div th:each="card, stat : ${drawnCards}"
+                 class="card-slot"
+                 th:data-index="${stat.index}"
+                 onclick="selectCard(this)">
+                <div class="card-inner">
+                    <div class="card-back">
+                        <div class="card-back-ornament">✦</div>
+                        <div class="card-back-border"></div>
+                    </div>
+                    <div class="card-front">
+                        <img th:src="@{/card-image/{id}(id=${card.card.id})}"
+                             th:alt="${card.card.nameKo}" class="card-img"/>
+                        <div class="card-direction-badge" th:classappend="${card.reversed} ? 'reversed' : ''"
+                             th:text="${card.direction}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script src="/js/card-select.js"></script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>리딩 결과 - 타로다요</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="result-container">
+    <h2 class="result-title">✨ 타로 리딩 결과</h2>
+    <p class="result-question">"<span th:text="${result.question}"></span>"</p>
+
+    <div class="result-cards">
+        <div th:each="card, stat : ${result.selectedCards}" class="result-card-slot">
+            <div class="position-label" th:text="${stat.index == 0 ? '과거' : stat.index == 1 ? '현재' : '미래'}"></div>
+            <div class="result-card" th:classappend="${card.reversed} ? 'reversed' : ''">
+                <img th:src="@{/card-image/{id}(id=${card.card.id})}"
+                     th:alt="${card.card.nameKo}"
+                     th:classappend="${card.reversed} ? 'card-img reversed-img' : 'card-img'"/>
+                <div class="result-card-direction" th:text="${card.direction}"></div>
+                <div class="result-keywords" th:text="${card.keywords}"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="interpretation-box">
+        <h3>🔮 AI 해석</h3>
+        <div class="interpretation-text" th:text="${result.interpretation}"></div>
+    </div>
+
+    <div class="result-actions">
+        <a href="/" class="btn-again">다시 뽑기</a>
+    </div>
+</div>
+<script src="/js/result.js"></script>
+</body>
+</html>
