@@ -24,21 +24,24 @@
     z-index: 9999;
 }
 
-/* ===== 3단계 진행 표시기 (상단 고정) ===== */
-.step-indicator {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 200;
+/* ===== 페이지 전체 래퍼 ===== */
+.page-wrap {
     display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ===== 3단계 진행 표시기 ===== */
+.step-indicator {
+    display: flex;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
-    gap: 0;
-    padding: 0.7rem 1rem;
-    background: rgba(13, 13, 26, 0.96);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(180, 100, 255, 0.18);
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background: rgba(20, 10, 35, 0.98);
+    border-bottom: 1px solid rgba(180, 100, 255, 0.2);
+    flex-shrink: 0;
 }
 
 .step-item {
@@ -109,9 +112,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
+    flex: 1;
     padding: 2rem;
-    padding-top: calc(68px + 2rem);
     animation: pageIn 0.4s ease-out;
 }
 
@@ -193,9 +195,8 @@ body {
 
 /* ===== 카드 선택 페이지 ===== */
 .select-container {
-    min-height: 100vh;
+    flex: 1;
     padding: 2rem;
-    padding-top: calc(68px + 1.5rem);
     text-align: center;
     animation: pageIn 0.4s ease-out;
 }
@@ -441,10 +442,10 @@ body {
 }
 
 .result-container {
-    min-height: 100vh;
+    flex: 1;
     padding: 3rem 2rem;
-    padding-top: calc(68px + 2rem);
     max-width: 900px;
+    width: 100%;
     margin: 0 auto;
     text-align: center;
     animation: pageIn 0.4s ease-out;
