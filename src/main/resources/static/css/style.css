@@ -4,6 +4,88 @@
     box-sizing: border-box;
 }
 
+/* ===== 페이지 진입 애니메이션 ===== */
+@keyframes pageIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== 스파클 파티클 ===== */
+@keyframes sparkle-float {
+    0%   { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-70px) scale(0); opacity: 0; }
+}
+
+.sparkle {
+    position: fixed;
+    pointer-events: none;
+    font-size: 1rem;
+    animation: sparkle-float 0.85s ease-out forwards;
+    z-index: 9999;
+}
+
+/* ===== 3단계 진행 표시기 ===== */
+.step-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 1.5rem 1rem 0;
+}
+
+.step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.step-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(180, 100, 255, 0.08);
+    border: 2px solid rgba(180, 100, 255, 0.25);
+    color: #5a4f70;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.step-item.active .step-circle {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    border-color: #a855f7;
+    color: white;
+    box-shadow: 0 0 14px rgba(168, 85, 247, 0.55);
+}
+
+.step-item.completed .step-circle {
+    background: rgba(168, 85, 247, 0.18);
+    border-color: rgba(168, 85, 247, 0.45);
+    color: #d4a8ff;
+}
+
+.step-label {
+    font-size: 0.62rem;
+    color: #3d3450;
+    margin-top: 0.3rem;
+    white-space: nowrap;
+}
+
+.step-item.active .step-label    { color: #c9aee8; }
+.step-item.completed .step-label { color: #8b7fa8; }
+
+.step-line {
+    width: 48px;
+    height: 2px;
+    background: rgba(180, 100, 255, 0.15);
+    margin: 14px 0 0;
+    flex-shrink: 0;
+}
+
+.step-line.completed { background: rgba(168, 85, 247, 0.45); }
+
 body {
     background: #0d0d1a;
     color: #e8e0f0;
@@ -18,6 +100,7 @@ body {
     justify-content: center;
     min-height: 100vh;
     padding: 2rem;
+    animation: pageIn 0.4s ease-out;
 }
 
 .hero {
@@ -101,6 +184,7 @@ body {
     min-height: 100vh;
     padding: 2rem;
     text-align: center;
+    animation: pageIn 0.4s ease-out;
 }
 
 .select-title {
@@ -288,12 +372,26 @@ body {
 }
 
 /* ===== 결과 페이지 ===== */
+@keyframes cardReveal {
+    from { opacity: 0; transform: translateY(24px) scale(0.94); }
+    to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+
 .result-container {
     min-height: 100vh;
     padding: 3rem 2rem;
     max-width: 900px;
     margin: 0 auto;
     text-align: center;
+    animation: pageIn 0.4s ease-out;
+}
+
+.result-card-slot:nth-child(1) { animation: cardReveal 0.5s ease-out 0.1s both; }
+.result-card-slot:nth-child(2) { animation: cardReveal 0.5s ease-out 0.3s both; }
+.result-card-slot:nth-child(3) { animation: cardReveal 0.5s ease-out 0.5s both; }
+
+.interpretation-box {
+    animation: cardReveal 0.5s ease-out 0.85s both;
 }
 
 .result-title {
@@ -471,4 +569,48 @@ body {
 .btn-again:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 30px rgba(124, 58, 237, 0.6);
+}
+
+/* ===== 모바일 반응형 ===== */
+@media (max-width: 600px) {
+    .select-title  { font-size: 1.5rem; }
+    .select-subtitle { font-size: 0.9rem; }
+
+    /* 카드 1열 정렬 */
+    .cards-area {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.2rem;
+    }
+
+    /* 카드 크기 고정 — 선택 여부와 무관하게 동일 */
+    .card-slot {
+        width: 150px;
+        height: 240px;
+        /* 터치 기기에서 hover 고착 방지 */
+        transform: none !important;
+    }
+
+    .card-slot:hover:not(.dimmed) {
+        transform: none;
+    }
+
+    /* 결과 카드도 세로 정렬 */
+    .result-cards {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .result-card {
+        width: 150px;
+    }
+
+    .result-card .card-img {
+        width: 140px;
+    }
+
+    .step-line { width: 32px; }
+
+    .title { font-size: 2.5rem; }
 }

@@ -7,6 +7,23 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
+<div class="step-indicator">
+    <div class="step-item completed">
+        <div class="step-circle">✓</div>
+        <div class="step-label">사연 입력</div>
+    </div>
+    <div class="step-line completed"></div>
+    <div class="step-item active">
+        <div class="step-circle">2</div>
+        <div class="step-label">카드 선택</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step-item">
+        <div class="step-circle">3</div>
+        <div class="step-label">결과 확인</div>
+    </div>
+</div>
+
 <div class="select-container">
     <h2 class="select-title">🌙 카드를 선택하세요</h2>
     <p class="select-subtitle">"<span th:text="${question}"></span>"</p>
@@ -18,7 +35,7 @@
             <div th:each="card, stat : ${drawnCards}"
                  class="card-slot"
                  th:data-index="${stat.index}"
-                 onclick="selectCard(this)">
+                 onclick="selectCard(this, event)">
                 <div class="card-inner">
                     <div class="card-back">
                         <div class="card-back-ornament">✦</div>
