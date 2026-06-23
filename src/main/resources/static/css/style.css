@@ -24,28 +24,38 @@
     z-index: 9999;
 }
 
-/* ===== 3단계 진행 표시기 ===== */
+/* ===== 3단계 진행 표시기 (상단 고정) ===== */
 .step-indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    padding: 1.5rem 1rem 0;
+    align-items: center;
+    gap: 0;
+    padding: 0.7rem 1rem;
+    background: rgba(13, 13, 26, 0.96);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(180, 100, 255, 0.18);
 }
 
 .step-item {
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 0.25rem;
 }
 
 .step-circle {
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     background: rgba(180, 100, 255, 0.08);
     border: 2px solid rgba(180, 100, 255, 0.25);
-    color: #5a4f70;
-    font-size: 0.8rem;
+    color: #6b5e88;
+    font-size: 0.78rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -57,34 +67,35 @@
     background: linear-gradient(135deg, #7c3aed, #a855f7);
     border-color: #a855f7;
     color: white;
-    box-shadow: 0 0 14px rgba(168, 85, 247, 0.55);
+    box-shadow: 0 0 12px rgba(168, 85, 247, 0.6);
 }
 
 .step-item.completed .step-circle {
-    background: rgba(168, 85, 247, 0.18);
-    border-color: rgba(168, 85, 247, 0.45);
+    background: rgba(168, 85, 247, 0.2);
+    border-color: rgba(168, 85, 247, 0.5);
     color: #d4a8ff;
 }
 
 .step-label {
-    font-size: 0.62rem;
-    color: #3d3450;
-    margin-top: 0.3rem;
+    font-size: 0.6rem;
+    color: #6b5e88;
     white-space: nowrap;
+    letter-spacing: 0.02em;
 }
 
 .step-item.active .step-label    { color: #c9aee8; }
-.step-item.completed .step-label { color: #8b7fa8; }
+.step-item.completed .step-label { color: #9d85c4; }
 
 .step-line {
-    width: 48px;
+    width: 44px;
     height: 2px;
-    background: rgba(180, 100, 255, 0.15);
-    margin: 14px 0 0;
+    background: rgba(180, 100, 255, 0.18);
     flex-shrink: 0;
+    align-self: center;
+    margin-bottom: 1.1rem; /* label 높이만큼 보정해서 원 중앙 정렬 */
 }
 
-.step-line.completed { background: rgba(168, 85, 247, 0.45); }
+.step-line.completed { background: rgba(168, 85, 247, 0.5); }
 
 body {
     background: #0d0d1a;
@@ -100,6 +111,7 @@ body {
     justify-content: center;
     min-height: 100vh;
     padding: 2rem;
+    padding-top: calc(68px + 2rem);
     animation: pageIn 0.4s ease-out;
 }
 
@@ -183,6 +195,7 @@ body {
 .select-container {
     min-height: 100vh;
     padding: 2rem;
+    padding-top: calc(68px + 1.5rem);
     text-align: center;
     animation: pageIn 0.4s ease-out;
 }
@@ -191,7 +204,6 @@ body {
     font-size: 2rem;
     color: #d4a8ff;
     margin-bottom: 0.5rem;
-    padding-top: 2rem;
 }
 
 .select-subtitle {
@@ -229,10 +241,18 @@ body {
     padding: 0 1rem;
 }
 
+/* 확인 버튼 래퍼 — 카드(absolute) 위에 z-index로 보이도록 */
+.confirm-area {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    margin-top: 2rem;
+    padding-bottom: 2rem;
+}
+
 /* 확인 버튼 */
 .btn-confirm {
     display: none;
-    margin: 2rem auto 0;
     padding: 0.9rem 3rem;
     background: linear-gradient(135deg, #7c3aed, #a855f7);
     color: white;
@@ -253,16 +273,17 @@ body {
 
 /* ===== 카드 뒤집기 ===== */
 .card-slot {
+    /* padding-bottom 트릭으로 2:3 비율 보장 (aspect-ratio는 absolute 자식이 있으면 높이 붕괴) */
+    position: relative;
     width: 100%;
-    aspect-ratio: 2 / 3;
+    padding-bottom: 150%;
     cursor: pointer;
     perspective: 800px;
     transition: opacity 0.3s;
-    position: relative;
 }
 
 .card-slot:hover:not(.dimmed) {
-    /* 카드는 제자리 고정 — translateY 없음 */
+    /* 카드는 제자리 고정 */
 }
 
 .card-slot.dimmed {
@@ -422,6 +443,7 @@ body {
 .result-container {
     min-height: 100vh;
     padding: 3rem 2rem;
+    padding-top: calc(68px + 2rem);
     max-width: 900px;
     margin: 0 auto;
     text-align: center;

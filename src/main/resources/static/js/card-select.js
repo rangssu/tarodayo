@@ -119,6 +119,8 @@ function updateUI() {
 }
 
 function submitForm() {
+    if (selectedIndexes.length < MAX_SELECT) return;
+
     const form = document.getElementById('selectForm');
     form.querySelectorAll('input[name="selectedIndexes"]').forEach(el => el.remove());
 
@@ -129,6 +131,10 @@ function submitForm() {
         input.value = idx;
         form.appendChild(input);
     });
+
+    // 버튼 중복 클릭 방지
+    const btn = document.getElementById('confirmBtn');
+    if (btn) btn.disabled = true;
 
     form.submit();
 }
