@@ -1,11 +1,10 @@
 const MAX_SELECT = 3;
+const POSITION_LABELS = ['과거', '현재', '미래'];
 let selectedIndexes = [];
 let audioCtx = null;
 
 function getAudioCtx() {
-    if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     return audioCtx;
 }
 
@@ -26,7 +25,7 @@ function playFlipSound() {
     } catch (e) {}
 }
 
-function playSelectSound() {
+function playCompleteSound() {
     try {
         const ctx = getAudioCtx();
         [523, 659, 784].forEach((freq, i) => {
@@ -36,7 +35,7 @@ function playSelectSound() {
             gain.connect(ctx.destination);
             osc.type = 'sine';
             osc.frequency.value = freq;
-            const t = ctx.currentTime + i * 0.08;
+            const t = ctx.currentTime + i * 0.09;
             gain.gain.setValueAtTime(0.1, t);
             gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
             osc.start(t);
@@ -61,12 +60,26 @@ function createSparkles(x, y) {
     });
 }
 
+function updatePositionLabels() {
+    document.querySelectorAll('.card-position-label').forEach(el => {
+        el.textContent = '';
+    });
+    selectedIndexes.forEach((cardIndex, pos) => {
+        const slot = document.querySelector(`.card-slot[data-index="${cardIndex}"]`);
+        if (slot) {
+            const label = slot.querySelector('.card-position-label');
+            if (label) label.textContent = POSITION_LABELS[pos];
+        }
+    });
+}
+
 function selectCard(slot, event) {
     const index = parseInt(slot.dataset.index);
 
     if (slot.classList.contains('selected')) {
         slot.classList.remove('selected');
         selectedIndexes = selectedIndexes.filter(i => i !== index);
+        updatePositionLabels();
         updateUI();
         return;
     }
@@ -76,17 +89,15 @@ function selectCard(slot, event) {
     playFlipSound();
 
     const rect = slot.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    createSparkles(cx, cy);
+    createSparkles(rect.left + rect.width / 2, rect.top + rect.height / 2);
 
     slot.classList.add('selected');
     selectedIndexes.push(index);
+    updatePositionLabels();
     updateUI();
 
     if (selectedIndexes.length === MAX_SELECT) {
-        playSelectSound();
-        setTimeout(submitForm, 700);
+        playCompleteSound();
     }
 }
 
@@ -94,14 +105,16 @@ function updateUI() {
     document.getElementById('count').textContent = selectedIndexes.length;
 
     const allSlots = document.querySelectorAll('.card-slot');
+    const confirmBtn = document.getElementById('confirmBtn');
+
     if (selectedIndexes.length >= MAX_SELECT) {
         allSlots.forEach(slot => {
-            if (!slot.classList.contains('selected')) {
-                slot.classList.add('dimmed');
-            }
+            if (!slot.classList.contains('selected')) slot.classList.add('dimmed');
         });
+        if (confirmBtn) confirmBtn.style.display = 'inline-block';
     } else {
         allSlots.forEach(slot => slot.classList.remove('dimmed'));
+        if (confirmBtn) confirmBtn.style.display = 'none';
     }
 }
 
