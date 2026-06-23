@@ -38,17 +38,30 @@ public class TarotController {
     }
 
     @PostMapping("/result")
-    public String result(@RequestParam int[] selectedIndexes, HttpSession session, Model model) {
+    public String result(@RequestParam(required = false) int[] selectedIndexes,
+                         HttpSession session, Model model) {
+
         List<DrawnCard> drawnCards = (List<DrawnCard>) session.getAttribute("drawnCards");
         String question = (String) session.getAttribute("question");
+
+        // 세션 만료 또는 잘못된 요청 → 홈으로 리다이렉트
+        if (drawnCards == null || question == null
+                || selectedIndexes == null || selectedIndexes.length != 3) {
+            return "redirect:/";
+        }
 
         List<DrawnCard> selectedCards = Arrays.stream(selectedIndexes)
                 .mapToObj(drawnCards::get)
                 .toList();
 
-        String interpretation = geminiService.interpret(question, selectedCards);
-        ReadingResult readingResult = new ReadingResult(question, selectedCards, interpretation);
+        String interpretation;
+        try {
+            interpretation = geminiService.interpret(question, selectedCards);
+        } catch (Exception e) {
+            interpretation = "AI 해석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+        }
 
+        ReadingResult readingResult = new ReadingResult(question, selectedCards, interpretation);
         model.addAttribute("result", readingResult);
         return "result";
     }
