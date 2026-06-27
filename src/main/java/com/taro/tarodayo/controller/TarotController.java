@@ -28,12 +28,18 @@ public class TarotController {
     }
 
     @PostMapping("/draw")
-    public String draw(@RequestParam String question, HttpSession session, Model model) {
+    public String draw(@RequestParam String question,
+                       @RequestParam(defaultValue = "three") String spreadType,
+                       HttpSession session, Model model) {
         List<DrawnCard> drawnCards = tarotCardService.drawFiveCards();
+        int maxSelect = "today".equals(spreadType) ? 1 : 3;
         session.setAttribute("drawnCards", drawnCards);
         session.setAttribute("question", question);
+        session.setAttribute("spreadType", spreadType);
         model.addAttribute("drawnCards", drawnCards);
         model.addAttribute("question", question);
+        model.addAttribute("maxSelect", maxSelect);
+        model.addAttribute("spreadType", spreadType);
         return "card-select";
     }
 
@@ -42,11 +48,14 @@ public class TarotController {
                          HttpSession session, Model model) {
 
         List<DrawnCard> drawnCards = (List<DrawnCard>) session.getAttribute("drawnCards");
-        String question = (String) session.getAttribute("question");
+        String question     = (String) session.getAttribute("question");
+        String spreadType   = (String) session.getAttribute("spreadType");
+        if (spreadType == null) spreadType = "three";
 
-        // 세션 만료 또는 잘못된 요청 → 홈으로 리다이렉트
+        int expectedCount = "today".equals(spreadType) ? 1 : 3;
+
         if (drawnCards == null || question == null
-                || selectedIndexes == null || selectedIndexes.length != 3) {
+                || selectedIndexes == null || selectedIndexes.length != expectedCount) {
             return "redirect:/";
         }
 
@@ -56,13 +65,16 @@ public class TarotController {
 
         String interpretation;
         try {
-            interpretation = geminiService.interpret(question, selectedCards);
+            interpretation = "today".equals(spreadType)
+                    ? geminiService.interpretOneCard(question, selectedCards.get(0))
+                    : geminiService.interpret(question, selectedCards);
         } catch (Exception e) {
             interpretation = "AI 해석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
         }
 
         ReadingResult readingResult = new ReadingResult(question, selectedCards, interpretation);
         model.addAttribute("result", readingResult);
+        model.addAttribute("spreadType", spreadType);
         return "result";
     }
 }

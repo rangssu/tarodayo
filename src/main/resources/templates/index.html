@@ -31,6 +31,22 @@
             <p class="subtitle">AI가 카드에 담긴 당신의 이야기를 읽어드립니다</p>
 
             <form action="/draw" method="post" class="question-form">
+                <div class="spread-select">
+                    <label class="spread-option">
+                        <input type="radio" name="spreadType" value="three" checked>
+                        <span class="spread-label">
+                            <strong>과거·현재·미래</strong>
+                            <small>3장으로 시간의 흐름을 읽습니다</small>
+                        </span>
+                    </label>
+                    <label class="spread-option">
+                        <input type="radio" name="spreadType" value="today">
+                        <span class="spread-label">
+                            <strong>오늘의 카드</strong>
+                            <small>1장으로 오늘의 에너지를 읽습니다</small>
+                        </span>
+                    </label>
+                </div>
                 <div class="input-group">
                     <label for="question">오늘 어떤 것이 궁금한가요?</label>
                     <textarea id="question" name="question"

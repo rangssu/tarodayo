@@ -1,3 +1,5 @@
+let interpretationFullText = '';
+
 function playRevealSound() {
     try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -17,23 +19,58 @@ function playRevealSound() {
     } catch (e) {}
 }
 
+function copyReading() {
+    const question = document.getElementById('resultQuestion')?.textContent || '';
+
+    const cardLines = [];
+    document.querySelectorAll('.result-card-slot').forEach(slot => {
+        const position  = slot.querySelector('.position-label')?.textContent || '';
+        const nameKo    = slot.querySelector('img')?.alt || '';
+        const direction = slot.querySelector('.result-card-direction')?.textContent || '';
+        const keywords  = slot.querySelector('.result-keywords')?.textContent || '';
+        cardLines.push(`- ${position}: ${nameKo} (${direction}) — ${keywords}`);
+    });
+
+    const text = [
+        '[타로다요 리딩 결과]',
+        '',
+        `질문: "${question}"`,
+        '',
+        '🃏 카드:',
+        ...cardLines,
+        '',
+        '🔮 AI 해석:',
+        interpretationFullText
+    ].join('\n');
+
+    const btn = document.getElementById('copyBtn');
+    const originalText = btn?.textContent || '';
+
+    navigator.clipboard.writeText(text).then(() => {
+        if (btn) {
+            btn.textContent = '복사됨! ✓';
+            setTimeout(() => { btn.textContent = originalText; }, 2000);
+        }
+    }).catch(() => {
+        alert(text);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    // 결과 카드 등장 시 효과음
     setTimeout(playRevealSound, 150);
 
-    // AI 해석 타이핑 효과
     const textEl = document.querySelector('.interpretation-text');
     if (!textEl) return;
 
-    const fullText = textEl.textContent;
+    interpretationFullText = textEl.textContent;
     textEl.textContent = '';
 
     let i = 0;
     const speed = 18;
 
     function type() {
-        if (i < fullText.length) {
-            textEl.textContent += fullText[i++];
+        if (i < interpretationFullText.length) {
+            textEl.textContent += interpretationFullText[i++];
             setTimeout(type, speed);
         }
     }

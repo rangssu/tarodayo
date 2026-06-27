@@ -26,13 +26,13 @@
     </div>
 
     <div class="select-container">
-        <h2 class="select-title">🌙 카드를 선택하세요</h2>
+        <h2 class="select-title" th:text="${maxSelect == 1 ? '🌟 오늘의 카드를 고르세요' : '🌙 카드를 선택하세요'}">🌙 카드를 선택하세요</h2>
         <p class="select-subtitle">"<span th:text="${question}"></span>"</p>
-        <p class="select-guide">5장 중 <strong>3장</strong>을 골라주세요</p>
-        <div class="selected-count">선택됨: <span id="count">0</span> / 3</div>
+        <p class="select-guide">5장 중 <strong th:text="${maxSelect}+'장'">3장</strong>을 골라주세요</p>
+        <div class="selected-count">선택됨: <span id="count">0</span> / <span th:text="${maxSelect}">3</span></div>
 
         <form id="selectForm" action="/result" method="post">
-            <div class="cards-area">
+            <div class="cards-area" th:data-max-select="${maxSelect}" th:data-spread-type="${spreadType}">
                 <div th:each="card, stat : ${drawnCards}"
                      class="card-slot"
                      th:data-index="${stat.index}"
@@ -44,8 +44,10 @@
                         </div>
                         <div class="card-front">
                             <div class="card-position-label"></div>
-                            <img th:src="@{/card-image/{id}(id=${card.card.id})}"
-                                 th:alt="${card.card.nameKo}" class="card-img"/>
+                            <img th:src="@{|/images/tarot/${card.card.cardNumber}.jpg|}"
+                                 th:alt="${card.card.nameKo}" class="card-img"
+                                 th:data-id="${card.card.id}"
+                                 onerror="this.onerror=null;this.src='/card-image/'+this.dataset.id"/>
                             <div class="card-direction-badge" th:classappend="${card.reversed} ? 'reversed' : ''"
                                  th:text="${card.direction}"></div>
                         </div>

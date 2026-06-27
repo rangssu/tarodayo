@@ -1,5 +1,8 @@
-const MAX_SELECT = 3;
-const POSITION_LABELS = ['과거', '현재', '미래'];
+const _cardsArea = document.querySelector('.cards-area');
+const MAX_SELECT = parseInt(_cardsArea?.dataset.maxSelect) || 3;
+const POSITION_LABELS = _cardsArea?.dataset.spreadType === 'today'
+    ? ['오늘']
+    : ['과거', '현재', '미래'];
 let selectedIndexes = [];
 let audioCtx = null;
 
@@ -132,9 +135,12 @@ function submitForm() {
         form.appendChild(input);
     });
 
-    // 버튼 중복 클릭 방지
     const btn = document.getElementById('confirmBtn');
-    if (btn) btn.disabled = true;
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner">⟳</span> 운명을 읽는 중...';
+        btn.classList.add('loading');
+    }
 
     form.submit();
 }
