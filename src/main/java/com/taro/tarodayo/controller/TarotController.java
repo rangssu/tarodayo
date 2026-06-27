@@ -28,9 +28,12 @@ public class TarotController {
     }
 
     @PostMapping("/draw")
-    public String draw(@RequestParam String question,
+    public String draw(@RequestParam(defaultValue = "") String question,
                        @RequestParam(defaultValue = "three") String spreadType,
                        HttpSession session, Model model) {
+        if (question.isBlank() && "today".equals(spreadType)) {
+            question = "오늘 하루를 위한 카드";
+        }
         List<DrawnCard> drawnCards = tarotCardService.drawFiveCards();
         int maxSelect = "today".equals(spreadType) ? 1 : 3;
         session.setAttribute("drawnCards", drawnCards);
