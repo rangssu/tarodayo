@@ -62,6 +62,12 @@
         </form>
     </div>
 </div>
+<script th:inline="javascript">
+    window._taroConfig = {
+        maxSelect: /*[[${maxSelect}]]*/ 3,
+        spreadType: /*[[${spreadType}]]*/ 'three'
+    };
+</script>
 <script src="/js/card-select.js"></script>
 </body>
 </html>

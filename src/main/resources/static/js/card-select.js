@@ -1,6 +1,5 @@
-const _cardsArea = document.querySelector('.cards-area');
-const MAX_SELECT = parseInt(_cardsArea?.dataset.maxSelect) || 3;
-const POSITION_LABELS = _cardsArea?.dataset.spreadType === 'today'
+const MAX_SELECT = (window._taroConfig && window._taroConfig.maxSelect) || 3;
+const POSITION_LABELS = (window._taroConfig && window._taroConfig.spreadType) === 'today'
     ? ['오늘']
     : ['과거', '현재', '미래'];
 let selectedIndexes = [];
