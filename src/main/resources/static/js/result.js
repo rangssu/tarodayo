@@ -46,14 +46,35 @@ function copyReading() {
     const btn = document.getElementById('copyBtn');
     const originalText = btn?.textContent || '';
 
-    navigator.clipboard.writeText(text).then(() => {
+    function onSuccess() {
         if (btn) {
             btn.textContent = '복사됨! ✓';
             setTimeout(() => { btn.textContent = originalText; }, 2000);
         }
-    }).catch(() => {
-        alert(text);
-    });
+    }
+
+    function fallbackCopy() {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        try {
+            document.execCommand('copy');
+            onSuccess();
+        } catch (e) {
+            if (btn) btn.textContent = '복사 실패 — 직접 선택해주세요';
+            setTimeout(() => { if (btn) btn.textContent = originalText; }, 2500);
+        }
+        document.body.removeChild(ta);
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(onSuccess).catch(fallbackCopy);
+    } else {
+        fallbackCopy();
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
