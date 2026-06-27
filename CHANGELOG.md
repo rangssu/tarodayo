@@ -197,6 +197,83 @@ CSS `filter` 속성은 자식 요소의 `transform-style: preserve-3d`를 강제
 
 ---
 
+## 7차 작업 — 6가지 UX 기능 개선
+
+### 기능 목록
+
+**1. 로딩 스피너 (버튼 상태 피드백)**
+- "운명을 확인하기" 클릭 시 버튼이 "⟳ 운명을 읽는 중..."으로 전환
+- `@keyframes spin` + `.spinner` CSS, `btn-confirm.loading` 상태 추가
+- 중복 클릭 방지 (`disabled` 처리)
+
+**2. 결과 복사 기능**
+- 결과 페이지에 "결과 복사하기 📋" 버튼 추가
+- 질문 + 선택 카드(포지션·방향·키워드) + AI 해석 전문을 클립보드에 복사
+- `Clipboard API` 사용, 실패 시 `alert()` 폴백
+- `result.js`에 `interpretationFullText` 모듈 변수로 타이핑 애니메이션 시작 전 원문 캡처
+
+**3. AI 프롬프트 강화**
+- `GeminiService.java`에 `SYSTEM_PROMPT` 상수 추가 (신비로운 타로 마스터 페르소나)
+- `.system()` / `.user()` 역할 분리
+- 각 포지션별 3~4문장, 카드 간 흐름 분석, 시적인 마무리 요청
+
+**4. Rider-Waite 실제 타로 이미지 적용**
+- Wikimedia Commons 공개 도메인 이미지 (1909년 Rider-Waite-Smith 덱)
+- `src/main/resources/static/images/tarot/0.jpg ~ 21.jpg` (22장 메이저 아르카나)
+- `card-select.html` / `result.html` 이미지 경로 변경: `/images/tarot/{cardNumber}.jpg`
+- `onerror` SVG 폴백: 이미지 없을 시 `/card-image/{id}` (기존 동적 SVG) 사용
+
+**5. 태블릿 반응형 (601px ~ 1024px)**
+- 기존: 모바일(1열) / PC(5열) 사이에 중간 대응 없음
+- 추가: 태블릿에서 3열 그리드 (`grid-template-columns: repeat(3, 1fr)`)
+
+**6. 스프레드 선택 (메인 페이지)**
+- 질문 입력 위에 스프레드 타입 선택 버튼 추가
+  - 🕰 과거·현재·미래 (3장)
+  - 🌟 오늘의 카드 (1장)
+- `TarotController.java`: `spreadType` 파라미터 수신, 세션 저장, `maxSelect` 계산
+- `GeminiService.java`: `interpretOneCard()` 메서드 추가 (1장 전용 프롬프트)
+- `card-select.html` / `result.html`: `spreadType`에 따른 타이틀·라벨 동적 변경
+
+---
+
+## 8차 작업 — 버그 수정 및 UX 추가 개선
+
+### 수정 내용
+
+**스프레드 선택 UI 버튼 카드 스타일 개선**
+- 라디오 버튼을 숨기고 `<label>` 전체를 클릭 영역으로 전환
+  ```css
+  .spread-option input[type="radio"] {
+      position: absolute; opacity: 0; width: 0; height: 0;
+  }
+  ```
+- 선택 상태: `input:checked + .spread-label` 보라 테두리·배경 강조
+- 설명 텍스트에 `<br>` 줄바꿈 추가, 이모지(🕰 / 🌟) 추가
+- CSS 버전 `v=5` → `v=6` 캐시 무효화
+
+**오늘의 카드 — 질문 선택 사항으로 변경**
+- `main.js`: 스프레드 전환 시 `textarea`의 `required` 속성 동적 제거/추가, placeholder 변경
+  - 오늘의 카드 선택 → placeholder: "오늘 특별히 궁금한 것이 있다면 적어주세요. (선택 사항)"
+- `TarotController.java`: 질문 없이 제출 시 `"오늘 하루를 위한 카드"` 기본값 사용
+
+**maxSelect JS 버그 수정 (핵심)**
+- **원인**: `th:data-max-select="${maxSelect}"` 어트리뷰트를 `dataset.maxSelect`로 읽는 방식이
+  일부 환경에서 실패 → `MAX_SELECT` 항상 기본값 3으로 떨어짐
+  - 증상: 타이틀은 "오늘의 카드를 고르세요" (서버 렌더링 정상)인데 카드 3장 선택 요구 (JS 오동작)
+- **수정**: Thymeleaf 인라인 JS로 서버 값을 직접 주입
+  ```html
+  <script th:inline="javascript">
+      window._taroConfig = {
+          maxSelect: /*[[${maxSelect}]]*/ 3,
+          spreadType: /*[[${spreadType}]]*/ 'three'
+      };
+  </script>
+  ```
+  `card-select.js`에서 `dataset` 대신 `window._taroConfig` 읽도록 변경
+
+---
+
 ## 커밋 히스토리 요약
 
 | 커밋 | 내용 |
@@ -207,19 +284,28 @@ CSS `filter` 속성은 자식 요소의 `transform-style: preserve-3d`를 강제
 | `aa11c83` | fix: CSS 버전 파라미터로 캐시 무효화, step-indicator 구조 개선 |
 | `d6f685e` | fix: 카드 3D flip 복원 (filter→box-shadow), 결과 페이지 500 에러 처리 |
 | `0f2ac72` | fix: 카드 위치 이탈 근본 원인 제거, textarea 리사이즈 비활성화 |
+| `53a9a74` | feat: 로딩 스피너, 결과 복사, AI 프롬프트 강화, Rider-Waite 이미지, 태블릿 반응형, 스프레드 선택 |
+| `10be99c` | fix: 스프레드 선택 UI 버튼 카드 스타일로 개선 |
+| `b1574b7` | fix: CSS 버전 v5→v6 캐시 무효화 |
+| `a584dc4` | feat: 오늘의 카드 선택 시 질문 입력 선택 사항으로 변경 |
+| `8593f65` | fix: maxSelect/spreadType을 Thymeleaf 인라인 JS로 주입 |
 
 ---
 
-## 현재 상태 (2026-06-23 기준)
+## 현재 상태 (2026-06-27 기준)
 
 - [x] Spring Boot 4.1 + Gemini AI 풀스택 구현
 - [x] Railway 배포 완료 (GitHub push → 자동 배포)
 - [x] 3단계 흐름: 사연 입력 → 카드 선택 → 결과 확인
-- [x] 5열 CSS Grid 카드 레이아웃 (PC/모바일 공통)
+- [x] 스프레드 선택: 과거·현재·미래 (3장) / 오늘의 카드 (1장)
+- [x] 오늘의 카드 질문 선택 사항 (질문 없으면 기본 문구 사용)
+- [x] 5열 CSS Grid 카드 레이아웃 (PC) / 3열 (태블릿) / 1열 (모바일)
 - [x] 카드 제자리 3D Flip (위치 이탈 없음)
 - [x] 과거/현재/미래 라벨 (선택 순서 기반)
-- [x] "운명을 확인하기" 버튼 정상 동작
+- [x] "운명을 확인하기" 버튼 + 로딩 스피너
+- [x] 결과 복사하기 (클립보드 API)
+- [x] Rider-Waite 실제 타로 이미지 (22장 메이저 아르카나, SVG 폴백)
+- [x] AI 신비로운 타로 마스터 페르소나 프롬프트
 - [x] 결과 페이지 500 에러 처리 (세션 만료 + Gemini API 예외)
 - [x] 효과음 + 스파클 이펙트
-- [x] textarea resize 비활성화
 - [x] step-indicator PC/모바일 공통 정상 표시
